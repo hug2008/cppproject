@@ -41,23 +41,33 @@ cat << END                                                     > $PROJECT/Makefi
 PROJECT=$PROJECT
 SRC=\$(shell find . -type f | egrep *.cpp\$\$)
 OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CSRC=\$(shell find . -type f | egrep *.c\$\$)
+COBJ=\$(patsubst %.c,%.O,\$(CSRC))
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
+CC=gcc
+CFLAGS+=-O3 -std=c11 -Wall
 CXX=g++ 
-CXXFLAGS+=-O3 -std=c++11 -Wall -I\$(INSTALL_DIR)/include
+CXXFLAGS+=-O3 -std=c++11 -Wall
 LDLIBS+=
 
 
 all:\$(PROJECT)
 
-\$(PROJECT): \$(OBJ)
-	\$(CXX) \$(CXXFLAGS)  \$(LDLIBS) -o \$@ \$^
+%.o:%.cpp
+	\$(CXX) \$(CXXFLAGS) -c -o \$@ \$<
+
+%.O:%.c
+	\$(CC) \$(CFLAGS) -c -o \$@ \$<
+
+\$(PROJECT): \$(COBJ) \$(OBJ)
+	\$(CXX)  \$(LDLIBS) -o \$@ \$^
 
 clean:
-	rm -f  \$(OBJ) \$(PROJECT)
+	rm -f  \$(COBJ) \$(OBJ) \$(PROJECT)
 
 install:
 	test -d \$(INSTALL_DIR)/ || mkdir -p \$(INSTALL_DIR)/
@@ -92,23 +102,33 @@ cat << END                                                     > $PROJECT/Makefi
 PROJECT=lib$PROJECT.so
 SRC=\$(shell find . -type f | egrep *.cpp\$\$)
 OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CSRC=\$(shell find . -type f | egrep *.c\$\$)
+COBJ=\$(patsubst %.c,%.O,\$(CSRC))
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
+CC=gcc
+CFLAGS+=-O3 -std=c11 -Wall
 CXX=g++ 
-CXXFLAGS+=-O3 -std=c++11 -fPIC -Wall -I\$(INSTALL_DIR)/include
+CXXFLAGS+=-O3 -std=c++11 -fPIC -Wall
 LDLIBS+=
 LDFLAGS+=-shared
 
 all:\$(PROJECT)
 
-\$(PROJECT): \$(OBJ)
-	\$(CXX) \$(CXXFLAGS) \$(LDFLAGS)  \$(LDLIBS) -o \$@ \$^
+%.o:%.cpp
+	\$(CXX) \$(CXXFLAGS) \$(LDFLAGS) -c -o \$@ \$<
+
+%.O:%.c
+	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c -o $@ $<
+
+\$(PROJECT): \$(COBJ)  \$(OBJ)
+	\$(CXX) \$(LDFLAGS)  \$(LDLIBS) -o \$@ \$^
 
 clean:
-	rm -f  \$(OBJ) \$(PROJECT)
+	rm -f  \$(COBJ) \$(OBJ)  \$(PROJECT)
 
 install:
 	test -d \$(INSTALL_DIR)/ || mkdir -p \$(INSTALL_DIR)/
@@ -155,11 +175,15 @@ cat << END                                                     > $PROJECT/Makefi
 PROJECT=lib$PROJECT.a
 SRC=\$(shell find . -type f | egrep *.cpp\$\$)
 OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CSRC=\$(shell find . -type f | egrep *.c\$\$)
+COBJ=\$(patsubst %.c,%.O,\$(CSRC))
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
+CC=gcc
+CFLAGS+=-O3 -std=c11 -Wall
 CXX=g++ 
 CXXFLAGS+=-O3 -std=c++11 -Wall -I\$(INSTALL_DIR)/include
 LDLIBS+=
@@ -169,9 +193,11 @@ all:\$(PROJECT)
 
 %.o: %.cpp
 	\$(CXX) \$(CXXFLAGS)  \$(LDLIBS) -c -o \$@ \$<
-    
 
-\$(PROJECT): \$(OBJ)
+%.O:%.c
+	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c -o $@ $<
+
+\$(PROJECT): \$(COBJ) \$(OBJ)
 	ar rvs \$@ \$^
     
 
