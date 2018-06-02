@@ -64,7 +64,7 @@ all:\$(PROJECT)
 	\$(CC) \$(CFLAGS) -c -o \$@ \$<
 
 \$(PROJECT): \$(COBJ) \$(OBJ)
-	\$(CXX)  \$(LDLIBS) -o \$@ \$^
+	\$(CXX)  -o \$@ \$^ \$(LDLIBS)
 
 clean:
 	rm -f  \$(COBJ) \$(OBJ) \$(PROJECT)
@@ -125,7 +125,7 @@ all:\$(PROJECT)
 	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c -o $@ $<
 
 \$(PROJECT): \$(COBJ)  \$(OBJ)
-	\$(CXX) \$(LDFLAGS)  \$(LDLIBS) -o \$@ \$^
+	\$(CXX) \$(LDFLAGS) -o \$@ \$^ \$(LDLIBS) 
 
 clean:
 	rm -f  \$(COBJ) \$(OBJ)  \$(PROJECT)
@@ -192,10 +192,10 @@ LDLIBS+=
 all:\$(PROJECT)
 
 %.o: %.cpp
-	\$(CXX) \$(CXXFLAGS)  \$(LDLIBS) -c -o \$@ \$<
+	\$(CXX) \$(CXXFLAGS) -c -o \$@ \$< \$(LDLIBS) 
 
 %.O:%.c
-	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c -o $@ $<
+	\$(CC) \$(CFLAGS) -c -o $@ $< \$(LDLIBS)
 
 \$(PROJECT): \$(COBJ) \$(OBJ)
 	ar rvs \$@ \$^
