@@ -36,38 +36,54 @@ mkdir -pv $PROJECT
 
 app_makefile_tpl(){
 
-cat << END                                                     > $PROJECT/Makefile
+cat > $PROJECT/Makefile << END
 
 PROJECT=$PROJECT
-SRC=\$(shell find . -type f | egrep *.cpp\$\$)
-OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
+CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
+CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
+
 CSRC=\$(shell find . -type f | egrep *.c\$\$)
-COBJ=\$(patsubst %.c,%.O,\$(CSRC))
+COBJ=\$(patsubst %.c,%.o,\$(CSRC))
+
+OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
+
+CC=gcc
+CXX=g++
+
+CFLAGS+=-O3 -std=c11 -Wall
+CXXFLAGS+=-O3 -std=c++11 -Wall
+LDLIBS+=
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
-CC=gcc
-CFLAGS+=-O3 -std=c11 -Wall
-CXX=g++ 
-CXXFLAGS+=-O3 -std=c++11 -Wall
-LDLIBS+=
-
 
 all:\$(PROJECT)
 
-%.o:%.cpp
-	\$(CXX) \$(CXXFLAGS) -c -o \$@ \$<
+\$(PROJECT):\$(OBJ)
+	\$(CXX) \$(LDFLAGS) -o \$@ \$^ \$(LDLIBS) 
 
-%.O:%.c
-	\$(CC) \$(CFLAGS) -c -o \$@ \$<
+.c.o:
+	\$(CC) \$(CFLAGS) -c $< -o \$@
 
-\$(PROJECT): \$(COBJ) \$(OBJ)
-	\$(CXX)  -o \$@ \$^ \$(LDLIBS)
+.cpp.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
+
+.cc.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
+	
+.cxx.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
 
 clean:
-	rm -f  \$(COBJ) \$(OBJ) \$(PROJECT)
+	@for i in \$(OBJ);do echo "rm -f" \$\${i} && rm -f \$\${i} ;done
+	rm -f \$(PROJECT)
+
 
 install:
 	test -d \$(INSTALL_DIR)/ || mkdir -p \$(INSTALL_DIR)/
@@ -78,14 +94,14 @@ END
 
 echo "create app project $PROJECT demo source file."
 
-cat << END                                                     > $PROJECT/$PROJECT.cpp
+cat > $PROJECT/$PROJECT.cpp << END
 
 #include <iostream>
 
 
 int main(int,char**)
 {
-    std::cout << "hello,world" << std::endl;
+	std::cout << "hello,world." << std::endl;
     return 0;
 }
 
@@ -97,38 +113,55 @@ END
 
 sharedlib_makefile_tpl(){
 
-cat << END                                                     > $PROJECT/Makefile
+cat > $PROJECT/Makefile << END
 
 PROJECT=lib$PROJECT.so
-SRC=\$(shell find . -type f | egrep *.cpp\$\$)
-OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
+CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
+CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
+
 CSRC=\$(shell find . -type f | egrep *.c\$\$)
-COBJ=\$(patsubst %.c,%.O,\$(CSRC))
+COBJ=\$(patsubst %.c,%.o,\$(CSRC))
+
+OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
+
+CC=gcc
+CXX=g++
+
+CFLAGS+=-O3 -std=c11 -Wall -fPIC
+CXXFLAGS+=-O3 -std=c++11 -Wall -fPIC
+LDLIBS+=
+LDFLAGS+=-shared
+
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
-CC=gcc
-CFLAGS+=-O3 -std=c11 -Wall
-CXX=g++ 
-CXXFLAGS+=-O3 -std=c++11 -fPIC -Wall
-LDLIBS+=
-LDFLAGS+=-shared
 
 all:\$(PROJECT)
 
-%.o:%.cpp
-	\$(CXX) \$(CXXFLAGS) \$(LDFLAGS) -c -o \$@ \$<
-
-%.O:%.c
-	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c -o $@ $<
-
-\$(PROJECT): \$(COBJ)  \$(OBJ)
+\$(PROJECT):\$(OBJ)
 	\$(CXX) \$(LDFLAGS) -o \$@ \$^ \$(LDLIBS) 
 
+.c.o:
+	\$(CC) \$(CFLAGS) -c $< -o \$@
+
+.cpp.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
+
+.cc.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
+	
+.cxx.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@
+
 clean:
-	rm -f  \$(COBJ) \$(OBJ)  \$(PROJECT)
+	@for i in \$(OBJ);do echo "rm -f" \$\${i} && rm -f \$\${i} ;done
+	rm -f \$(PROJECT)
 
 install:
 	test -d \$(INSTALL_DIR)/ || mkdir -p \$(INSTALL_DIR)/
@@ -139,7 +172,7 @@ END
 
 echo "create sharedlib project $PROJECT demo source file."
 
-cat << END                                                     > $PROJECT/$PROJECT.cpp
+cat > $PROJECT/$PROJECT.cpp << END
 
 class $PROJECT {
     public:
@@ -170,39 +203,54 @@ END
 
 staticlib_makefile_tpl(){
 
-cat << END                                                     > $PROJECT/Makefile
+cat > $PROJECT/Makefile << END
 
 PROJECT=lib$PROJECT.a
-SRC=\$(shell find . -type f | egrep *.cpp\$\$)
-OBJ=\$(patsubst %.cpp,%.o,\$(SRC))
+CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
+CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
+CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
+
 CSRC=\$(shell find . -type f | egrep *.c\$\$)
-COBJ=\$(patsubst %.c,%.O,\$(CSRC))
+COBJ=\$(patsubst %.c,%.o,\$(CSRC))
+
+OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
+
+CC=gcc
+CXX=g++
+
+CFLAGS+=-O3 -std=c11 -Wall
+CXXFLAGS+=-O3 -std=c++11 -Wall
+LDLIBS+=
 
 ifndef INSTALL_DIR
 INSTALL_DIR=/usr/local
 endif
 
-CC=gcc
-CFLAGS+=-O3 -std=c11 -Wall
-CXX=g++ 
-CXXFLAGS+=-O3 -std=c++11 -Wall -I\$(INSTALL_DIR)/include
-LDLIBS+=
 
 
 all:\$(PROJECT)
 
-%.o: %.cpp
-	\$(CXX) \$(CXXFLAGS) -c -o \$@ \$< \$(LDLIBS) 
-
-%.O:%.c
-	\$(CC) \$(CFLAGS) -c -o $@ $< \$(LDLIBS)
-
-\$(PROJECT): \$(COBJ) \$(OBJ)
+\$(PROJECT):\$(OBJ)
 	ar rvs \$@ \$^
-    
+
+.c.o:
+	\$(CC) \$(CFLAGS) -c $< -o \$@ \$(LDLIBS)
+
+.cpp.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@ \$(LDLIBS)
+
+.cc.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@ \$(LDLIBS)
+	
+.cxx.o:
+	\$(CXX) \$(CXXFLAGS)  -c \$< -o \$@ \$(LDLIBS)
 
 clean:
-	rm -f  \$(OBJ) \$(PROJECT)
+	@for i in \$(OBJ);do echo "rm -f" \$\${i} && rm -f \$\${i} ;done
+	rm -f \$(PROJECT)
 
 install:
 	test -d \$(INSTALL_DIR)/ || mkdir -p \$(INSTALL_DIR)/
@@ -213,7 +261,7 @@ END
 
 echo "create staticlib project $PROJECT demo source file."
 
-cat << END                                                     > $PROJECT/$PROJECT.cpp
+cat > $PROJECT/$PROJECT.cpp << END
 
 class $PROJECT {
     public:
@@ -242,11 +290,11 @@ END
 
 
 
-
-
 case $TYPE in
     app) app_makefile_tpl;;
     sharedlib) sharedlib_makefile_tpl;;
     staticlib) staticlib_makefile_tpl;;
     *) echo 'Please set TYPE in (app,sharedlib,staticlib)';;
 esac
+
+
