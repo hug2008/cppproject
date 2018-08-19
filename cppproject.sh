@@ -39,14 +39,14 @@ app_makefile_tpl(){
 cat > $PROJECT/Makefile << END
 
 PROJECT=$PROJECT
-CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPSRC=\$(shell find . -type f -name *.cpp)
 CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
-CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCSRC=\$(shell find . -type f -name *.cc)
 CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
-CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXSRC=\$(shell find . -type f -name *.cxx)
 CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
 
-CSRC=\$(shell find . -type f | egrep *.c\$\$)
+CSRC=\$(shell find . -type f -name *.c)
 COBJ=\$(patsubst %.c,%.o,\$(CSRC))
 
 OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
@@ -116,14 +116,14 @@ sharedlib_makefile_tpl(){
 cat > $PROJECT/Makefile << END
 
 PROJECT=lib$PROJECT.so
-CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPSRC=\$(shell find . -type f -name *.cpp)
 CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
-CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCSRC=\$(shell find . -type f -name *.cc)
 CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
-CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXSRC=\$(shell find . -type f -name *.cxx)
 CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
 
-CSRC=\$(shell find . -type f | egrep *.c\$\$)
+CSRC=\$(shell find . -type f -name *.c)
 COBJ=\$(patsubst %.c,%.o,\$(CSRC))
 
 OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
@@ -206,14 +206,14 @@ staticlib_makefile_tpl(){
 cat > $PROJECT/Makefile << END
 
 PROJECT=lib$PROJECT.a
-CPPSRC=\$(shell find . -type f | egrep *.cpp\$\$)
+CPPSRC=\$(shell find . -type f -name *.cpp)
 CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
-CCSRC=\$(shell find . -type f | egrep *.cc\$\$)
+CCSRC=\$(shell find . -type f -name *.cc)
 CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
-CXXSRC=\$(shell find . -type f | egrep *.cxx\$\$)
+CXXSRC=\$(shell find . -type f -name *.cxx)
 CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
 
-CSRC=\$(shell find . -type f | egrep *.c\$\$)
+CSRC=\$(shell find . -type f -name *.c)
 COBJ=\$(patsubst %.c,%.o,\$(CSRC))
 
 OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
