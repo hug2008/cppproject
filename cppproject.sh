@@ -32,21 +32,21 @@ fi
 
 echo "create cpp project $PROJECT Makefile."
 
-mkdir -pv $PROJECT
-
+mkdir -pv $PROJECT/src
+R
 app_makefile_tpl(){
 
 cat > $PROJECT/Makefile << END
 
 PROJECT=$PROJECT
-CPPSRC=\$(shell find . -maxdepth 3 -type f  -name '*.cpp')
+CPPSRC=\$(shell find src -type f  -name '*.cpp')
 CPPOBJ=\$(patsubst %.cpp,%.o,\$(CPPSRC))
-CCSRC=\$(shell find .  -maxdepth 3 -type f -name '*.cc')
+CCSRC=\$(shell find src -type f -name '*.cc')
 CCOBJ=\$(patsubst %.cc,%.o,\$(CCSRC))
-CXXSRC=\$(shell find . -maxdepth 3 -type f -name '*.cxx')
+CXXSRC=\$(shell find src -type f -name '*.cxx')
 CXXOBJ=\$(patsubst %.cxx,%.o,\$(CXXSRC))
 
-CSRC=\$(shell find . -maxdepth 3 -type f -name '*.c')
+CSRC=\$(shell find src -type f -name '*.c')
 COBJ=\$(patsubst %.c,%.o,\$(CSRC))
 
 OBJ=\$(COBJ) \$(CXXOBJ) \$(CCOBJ) \$(CPPOBJ)
@@ -94,7 +94,7 @@ END
 
 echo "create app project $PROJECT demo source file."
 
-cat > $PROJECT/$PROJECT.cpp << END
+cat > $PROJECT/src/$PROJECT.cpp << END
 
 #include <iostream>
 
